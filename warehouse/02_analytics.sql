@@ -49,8 +49,9 @@ select
   oi.sale_price,
   p.cost,
   oi.sale_price - p.cost as margin,
-  cast(oi.shipped_at as date) - cast(oi.created_at as date) as days_to_ship,
-  cast(oi.delivered_at as date) - cast(oi.created_at as date) as days_to_deliver,
+  case when oi.shipped_at >= oi.created_at then cast(oi.shipped_at as date) - cast(oi.created_at as date) end as days_to_ship,
+  case when oi.delivered_at >= oi.created_at then cast(oi.delivered_at as date) - cast(oi.created_at as date) end as days_to_deliver,
+  (oi.shipped_at < oi.created_at) as ship_before_order,
   (oi.returned_at is not null) as is_returned
 from staging.stg_order_items oi
 left join staging.stg_products p on p.product_id = oi.product_id;
